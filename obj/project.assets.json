@@ -2562,19 +2562,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/hilmanzu/.nuget/packages/": {}
+    "/home/hilmanzu/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
+      "projectUniqueName": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
       "projectName": "beresbackend",
-      "projectPath": "/Users/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
-      "packagesPath": "/Users/hilmanzu/.nuget/packages/",
-      "outputPath": "/Users/hilmanzu/Documents/beres/beres_backend/obj/",
+      "projectPath": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
+      "packagesPath": "/home/hilmanzu/.nuget/packages/",
+      "outputPath": "/home/hilmanzu/Documents/beres/beres_backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/hilmanzu/.nuget/NuGet/NuGet.Config"
+        "/home/hilmanzu/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -2592,11 +2592,6 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -2667,7 +2662,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.416/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.123/PortableRuntimeIdentifierGraph.json"
       }
     }
   },
