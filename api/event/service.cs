@@ -15,7 +15,7 @@ namespace RepositoryPattern.Services.EventService
         public EventService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             dataUser = database.GetCollection<Event>("Event");
             Users = database.GetCollection<User>("User");
             dataTransaksi = database.GetCollection<Transaksi>("Transaksi");

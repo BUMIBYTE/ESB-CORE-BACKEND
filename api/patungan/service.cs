@@ -15,7 +15,7 @@ namespace RepositoryPattern.Services.PatunganService
         public PatunganService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             dataUser = database.GetCollection<Patungan>("Patungan");
             dataTransaksi = database.GetCollection<Transaksi>("Transaksi");
 

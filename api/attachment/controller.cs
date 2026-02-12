@@ -24,7 +24,7 @@ namespace beres.Server.Controllers
         public AttachmentController(IConfiguration configuration, IAttachmentService roleService, ConvertJWT convert)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             _IAttachmentService = roleService;
             _errorUtility = new ErrorHandlingUtility();
             _masterValidationService = new ValidationMasterDto();
@@ -39,7 +39,7 @@ namespace beres.Server.Controllers
             try
             {
                 var client = new MongoClient(_conf.GetConnectionString("ConnectionURI"));
-                var database = client.GetDatabase("beres");
+                var database = client.GetDatabase("beres2db");
                 var gridFSBucket = new GridFSBucket(database);
 
                 // Convert fileId to ObjectId
@@ -92,7 +92,7 @@ namespace beres.Server.Controllers
 
                 // Initialize GridFSBucket
                 var client = new MongoClient(_conf.GetConnectionString("ConnectionURI"));
-                var database = client.GetDatabase("beres");
+                var database = client.GetDatabase("beres2db");
                 var gridFSBucket = new GridFSBucket(database);
 
                 // Check if file is an image
@@ -185,7 +185,7 @@ namespace beres.Server.Controllers
             try
             {
                 var client = new MongoClient(_conf.GetConnectionString("ConnectionURI"));
-                var database = client.GetDatabase("beres");
+                var database = client.GetDatabase("beres2db");
                 var gridFSBucket = new GridFSBucket(database);
 
                 // Filter hanya untuk image types
@@ -236,7 +236,7 @@ namespace beres.Server.Controllers
             try
             {
                 var client = new MongoClient(_conf.GetConnectionString("ConnectionURI"));
-                var database = client.GetDatabase("beres");
+                var database = client.GetDatabase("beres2db");
                 var gridFSBucket = new GridFSBucket(database);
 
                 var objectId = new ObjectId(fileId);

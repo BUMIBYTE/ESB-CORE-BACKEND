@@ -1,17 +1,13 @@
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
 
-# Salin seluruh project
-COPY . ./
-
-# Restore dependencies
-RUN dotnet restore
-
-# Publish
-RUN dotnet publish -c Release --no-restore -o /out
-
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /out .
-
+EXPOSE 5000
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:5000
 ENTRYPOINT ["dotnet", "beresbackend.dll"]

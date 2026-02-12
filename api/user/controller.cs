@@ -24,7 +24,7 @@ namespace Trasgo.Server.Controllers
             _errorUtility = new ErrorHandlingUtility();
             _masterValidationService = new ValidationMasterDto();
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             Users = database.GetCollection<User>("User");
 
         }

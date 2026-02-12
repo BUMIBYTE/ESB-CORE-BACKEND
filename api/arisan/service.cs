@@ -15,7 +15,7 @@ namespace RepositoryPattern.Services.ArisanService
         public ArisanService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             dataUser = database.GetCollection<Arisan>("Arisan");
             dataTransaksi = database.GetCollection<Transaksi>("Transaksi");
 

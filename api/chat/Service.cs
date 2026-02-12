@@ -16,7 +16,7 @@ namespace RepositoryPattern.Services.ChatService
         public ChatService(IConfiguration configuration)
         {
             var mongoClient = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            var database = mongoClient.GetDatabase("beres");
+            var database = mongoClient.GetDatabase("beres2db");
             _ChatCollection = database.GetCollection<ChatModel>("Chat");
             _userCollection = database.GetCollection<User>("User");
             _settingCollection = database.GetCollection<Setting>("Setting");

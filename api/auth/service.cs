@@ -31,7 +31,7 @@ namespace RepositoryPattern.Services.AuthService
         public AuthService(IConfiguration configuration, ILogger<AuthService> logger)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             dataUser = database.GetCollection<User>("User");
             dataChat = database.GetCollection<ChatModel>("Chat");
             dataOrder = database.GetCollection<Order>("Order");

@@ -24,6 +24,9 @@ using RepositoryPattern.Services.RedPayService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Pastikan listen di semua interface
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
+
 // Dependency Injection
 builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -37,12 +40,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IRekeningService, RekeningService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IRedPayService, RedPayService>();
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -108,7 +109,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Allow CORS from any origin
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -137,11 +138,12 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 
+// 🔹 Swagger Aktif untuk semua environment
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Beres API V1");
 });
 
 app.UseHttpsRedirection();

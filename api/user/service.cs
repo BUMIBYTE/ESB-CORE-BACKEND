@@ -12,7 +12,7 @@ namespace RepositoryPattern.Services.UserService
         public UserService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             dataUser = database.GetCollection<User>("User");
             dataTransaksi = database.GetCollection<Transaksi>("Transaksi");
             this.key = configuration.GetSection("AppSettings")["JwtKey"];

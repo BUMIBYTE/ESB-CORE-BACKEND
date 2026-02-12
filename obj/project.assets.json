@@ -2562,7 +2562,7 @@
     ]
   },
   "packageFolders": {
-    "/home/hilmanzu/.nuget/packages/": {}
+    "/root/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
@@ -2570,11 +2570,11 @@
       "projectUniqueName": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
       "projectName": "beresbackend",
       "projectPath": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
-      "packagesPath": "/home/hilmanzu/.nuget/packages/",
+      "packagesPath": "/root/.nuget/packages/",
       "outputPath": "/home/hilmanzu/Documents/beres/beres_backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/hilmanzu/.nuget/NuGet/NuGet.Config"
+        "/root/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

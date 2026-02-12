@@ -14,7 +14,7 @@ namespace RepositoryPattern.Services.AttachmentService
         public AttachmentService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            IMongoDatabase database = client.GetDatabase("beres");
+            IMongoDatabase database = client.GetDatabase("beres2db");
             AttachmentLink = database.GetCollection<Attachments>("Attachment");
             this.key = configuration.GetSection("AppSettings")["JwtKey"];
         }

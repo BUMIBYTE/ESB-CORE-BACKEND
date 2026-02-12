@@ -16,7 +16,7 @@ namespace RepositoryPattern.Services.RekeningService
         public RekeningService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            var database = client.GetDatabase("beres");
+            var database = client.GetDatabase("beres2db");
             _settingCollection = database.GetCollection<Setting>("Setting");
             _settingCollection2 = database.GetCollection<Setting2>("Setting");
             _settingCollection3 = database.GetCollection<Setting3>("Setting");

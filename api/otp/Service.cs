@@ -15,7 +15,7 @@ namespace RepositoryPattern.Services.OtpService
         public OtpService(IConfiguration configuration)
         {
             MongoClient client = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            var database = client.GetDatabase("beres");
+            var database = client.GetDatabase("beres2db");
             _otpCollection = database.GetCollection<OtpModel>("OTP");
             _userCollection = database.GetCollection<User>("User");
             _settingCollection = database.GetCollection<Setting>("Setting");
