@@ -10,11 +10,11 @@
         "projectUniqueName": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
         "projectName": "beresbackend",
         "projectPath": "/home/hilmanzu/Documents/beres/beres_backend/beresbackend.csproj",
-        "packagesPath": "/root/.nuget/packages/",
+        "packagesPath": "/home/hilmanzu/.nuget/packages/",
         "outputPath": "/home/hilmanzu/Documents/beres/beres_backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/home/hilmanzu/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"

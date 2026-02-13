@@ -194,7 +194,7 @@ namespace Trasgo.Server.Controllers
 
         private async Task<bool> IsUserRoleAllowedAsync(string idUser)
         {
-            var user = await Users.Find(_ => _.Phone == idUser).FirstOrDefaultAsync();
+            var user = await Users.Find(_ => _.Id == idUser).FirstOrDefaultAsync();
             return user != null && user.IdRole == "2";
         }
 

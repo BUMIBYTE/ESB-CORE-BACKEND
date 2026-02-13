@@ -29,8 +29,19 @@ namespace RepositoryPattern.Services.OrderService
         {
             try
             {
-                var items = await dataUser.Find(_ => _.IsActive == true).ToListAsync();
-                return new { code = 200, data = items, message = "Data Add Complete" };
+                var items = await dataUser.Find(_ => _.IsActive == true && _.Status == "Pending").ToListAsync();
+                var itemsMap = items.Select(item => new
+                {
+                    Id = item.Id,
+                    IdUser = Users.Find(x => x.Id == item.IdUser).FirstOrDefault()?.Phone ?? "Unknown User",
+                    Price = item.Price,
+                    UniqueCode = item.UniqueCode,
+                    Image = item.Image,
+                    Type = item.Type,
+                    Status = item.Status,
+                    CreatedAt = item.CreatedAt
+                }).ToList();
+                return new { code = 200, data = itemsMap, message = "Data Add Complete" };
             }
             catch (CustomException)
             {

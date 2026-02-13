@@ -211,7 +211,7 @@ namespace beres.Server.Controllers
                     uploadedBy = file.Metadata.GetValue("UploadedBy", "").AsString,
                     // previewUrl = $"https://{HttpContext.Request.Host}/api/v1/file/review/{file.Id}"
                     
-                    previewUrl = $"https://apiberes.coderchamps.co.id/api/v1/file/review/{file.Id}"
+                    previewUrl = $"https://apiberes.coderchamps.my.id/api/v1/file/review/{file.Id}"
                     
                 });
 
