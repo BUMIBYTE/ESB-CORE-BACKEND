@@ -280,16 +280,26 @@ namespace RepositoryPattern.Services.AuthService
                 var startOfYear = new DateTime(now.Year, 1, 1);
                 var endOfYear = new DateTime(now.Year, 12, 31, 23, 59, 59);
 
+                var oneYearAgo = DateTime.UtcNow.AddYears(-1);
+
                 var filter = Builders<Transaksi>.Filter.And(
                     Builders<Transaksi>.Filter.Eq(_ => _.Type, "KoperasiTahunan"),
                     Builders<Transaksi>.Filter.Eq(_ => _.IdUser, id),
-                    Builders<Transaksi>.Filter.Gte(_ => _.CreatedAt, startOfYear),
-                    Builders<Transaksi>.Filter.Lte(_ => _.CreatedAt, endOfYear)
+                    Builders<Transaksi>.Filter.Gt(x => x.CreatedAt, oneYearAgo)
+                );
+
+                var filterByPhone = Builders<Transaksi>.Filter.And(
+                    Builders<Transaksi>.Filter.Eq(_ => _.Type, "KoperasiTahunan"),
+                    Builders<Transaksi>.Filter.Eq(_ => _.IdUser, roleData.Phone),
+                    Builders<Transaksi>.Filter.Gt(x => x.CreatedAt, oneYearAgo)
                 );
 
                 var startOfMonthPayed = new DateTime(now.Year, now.Month, 1);
                 var endOfMonthPayed = startOfMonthPayed.AddMonths(1).AddTicks(-1);
+
                 var existingTransaction = await Transaksi.Find(filter).FirstOrDefaultAsync();
+                var existingTransactionByPhone = await Transaksi.Find(filterByPhone).FirstOrDefaultAsync();
+
 
                 var filterBulanan = Builders<Transaksi>.Filter.And(
                     Builders<Transaksi>.Filter.Eq(_ => _.Type, "KoperasiBulanan"),
@@ -309,7 +319,7 @@ namespace RepositoryPattern.Services.AuthService
                     Fcm = roleData.Fcm,
                     Image = roleData.Image,
                     Email = roleData.Email,
-                    IsMember = existingTransaction != null,
+                    IsMember = existingTransaction != null || existingTransactionByPhone != null,
                     IsPayMonthly = existingTransactionBulanan != null,
                     Role = roleData.IdRole,
                 };
