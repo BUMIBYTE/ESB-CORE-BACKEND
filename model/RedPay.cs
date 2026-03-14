@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Beres.Shared.Models
 {
-    public class RedPayModel : BaseModel
+    public class RedPayModel
     {
         [BsonId]
         public string? Id { get; set; }

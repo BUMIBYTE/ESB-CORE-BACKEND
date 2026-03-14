@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryPattern.Services.RedPayService;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Beres.Server.Controllers
 {
     // [Authorize]
     [ApiController]
-    [Route("api/v1/RedPay")]
+    [Route("api/v1/primakom")]
     public class RedPayController : ControllerBase
     {
         private readonly IRedPayService _RedPayService;
@@ -48,12 +49,12 @@ namespace Beres.Server.Controllers
         //     }
         // }
 
-        [HttpPost("createOrder")]
-        public async Task<IActionResult> GetRedPayWA([FromBody] CreateRedpayDto dto)
+        [HttpGet("sharepoint")]
+        public async Task<IActionResult> GetRedPayWA()
         {
             try
             {
-                var result = await _RedPayService.SendRedPayWAAsync(dto);
+                var result = await _RedPayService.GetData();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -62,27 +63,25 @@ namespace Beres.Server.Controllers
             }
         }
 
-        [HttpPost("approved")]
-        public async Task<IActionResult> Approved([FromBody] ApprovedRedpayDto dto)
-        {
-            try
-            {
-                var result = await _RedPayService.ApprovedRedPay(dto);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        // [HttpGet("esb")]
+        // public async Task<IActionResult> GetDataESB()
+        // {
+        //     try
+        //     {                var result = await _RedPayService.GetDataESB();
+        //         return Ok(result);      
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        // }
 
-        [HttpPost("previewOrder")]
-        public async Task<IActionResult> previewOrder([FromBody] PreviewRedpayDto dto)
+        [HttpPost("sap")]
+        public async Task<IActionResult> PostRedPayWA([FromBody] JsonElement request)
         {
             try
-            {
-                var result = await _RedPayService.previewOrder(dto);
-                return Ok(result);
+            {                var result = await _RedPayService.PostData(request);
+                return Ok(result);      
             }
             catch (Exception ex)
             {

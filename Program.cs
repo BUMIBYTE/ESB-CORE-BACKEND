@@ -6,20 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Trasgo.Shared.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
-using RepositoryPattern.Services.OtpService;
-using RepositoryPattern.Services.AuthService;
-using RepositoryPattern.Services.AttachmentService;
-using RepositoryPattern.Services.RoleService;
-using RepositoryPattern.Services.ArisanService;
-using RepositoryPattern.Services.RekeningService;
-using RepositoryPattern.Services.ChatService;
-using RepositoryPattern.Services.PatunganService;
-using RepositoryPattern.Services.TransaksiService;
-using RepositoryPattern.Services.UserService;
-using RepositoryPattern.Services.BannerService;
-using RepositoryPattern.Services.SettingService;
-using RepositoryPattern.Services.EventService;
-using RepositoryPattern.Services.OrderService;
 using RepositoryPattern.Services.RedPayService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,20 +15,6 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Dependency Injection
 builder.Services.AddSingleton<ConvertJWT>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddScoped<IAttachmentService, AttachmentService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IArisanService, ArisanService>();
-builder.Services.AddScoped<IPatunganService, PatunganService>();
-builder.Services.AddScoped<ITransaksiService, TransaksiService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IBannerService, BannerService>();
-builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<ISettingService, SettingService>();
-builder.Services.AddScoped<IRekeningService, RekeningService>();
-builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IRedPayService, RedPayService>();
 
 builder.Services.AddControllers();
@@ -73,8 +45,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "Beres.com",
-        ValidAudience = "Beres.com",
+        ValidIssuer = "Primakom.com",
+        ValidAudience = "Primakom.com",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
@@ -82,7 +54,7 @@ builder.Services.AddAuthentication(options =>
 // Swagger Config
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Beres", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Primakom", Version = "v1" });
     c.OperationFilter<SwaggerFileOperationFilter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -143,7 +115,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Beres API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Primakom API V1");
 });
 
 app.UseHttpsRedirection();
