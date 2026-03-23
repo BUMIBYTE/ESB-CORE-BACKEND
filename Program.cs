@@ -7,15 +7,17 @@ using Microsoft.OpenApi.Models;
 using Trasgo.Shared.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
 using RepositoryPattern.Services.RedPayService;
+using RepositoryPattern.Services.JbangService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Pastikan listen di semua interface
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.WebHost.UseUrls("http://0.0.0.0:5001");
 
 // Dependency Injection
 builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddScoped<IRedPayService, RedPayService>();
+builder.Services.AddScoped<IJbangService, JbangService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
