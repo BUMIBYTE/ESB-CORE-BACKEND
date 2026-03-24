@@ -8,6 +8,7 @@ using Trasgo.Shared.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
 using RepositoryPattern.Services.RedPayService;
 using RepositoryPattern.Services.JbangService;
+using RepositoryPattern.Services.SystemService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +19,13 @@ builder.WebHost.UseUrls("http://0.0.0.0:5001");
 builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddScoped<IRedPayService, RedPayService>();
 builder.Services.AddScoped<IJbangService, JbangService>();
+builder.Services.AddScoped<ISystemService, SystemService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<PortManager>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>

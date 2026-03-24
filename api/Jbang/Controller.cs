@@ -72,11 +72,18 @@ namespace Beres.Server.Controllers
         }
 
         [HttpPost("run")]
-        public IActionResult Run(string path)
+        public IActionResult Run(string path, int? port)
         {
-            var jobId = _service.RunJbang(path);
+            try
+            {
+                var jobId = _service.RunJbang(path, port);
 
-            return Ok(ResponseHelper.Success(jobId, "Jbang started"));
+                return Ok(ResponseHelper.Success(jobId, "Jbang started"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHelper.Error(ex.Message));
+            }
         }
 
         [HttpGet("status")]

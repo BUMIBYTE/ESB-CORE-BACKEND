@@ -9,7 +9,7 @@ public interface IJbangService
     string DeleteFile(string path);
     string DeleteFolder(string path);
 
-    string RunJbang(string filePath);
+    string RunJbang(string filePath, int? port = null);
     string StopJob(string jobId);
     string ResumeJob(string jobId);
     JbangJob GetStatus(string jobId);

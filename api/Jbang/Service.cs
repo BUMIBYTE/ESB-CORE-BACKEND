@@ -13,12 +13,14 @@ namespace RepositoryPattern.Services.JbangService
 
         private static int _currentPort = 3000;
         private static readonly object _lock = new();
+        private readonly PortManager _portManager;
 
 
-        public JbangService(IConfiguration configuration)
+        public JbangService(IConfiguration configuration, PortManager portManager)
         {
             var mongoClient = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
             var database = mongoClient.GetDatabase("primakom");
+            _portManager = portManager;
 
             // base folder (biar aman)
             _basePath = Path.Combine(Directory.GetCurrentDirectory(), "storage");
@@ -158,32 +160,31 @@ namespace RepositoryPattern.Services.JbangService
             return $"Folder berhasil dihapus: {fullPath}";
         }
 
-        public string RunJbang(string filePath)
+        public string RunJbang(string filePath, int? portInput = null)
         {
             var jobId = Guid.NewGuid().ToString();
 
             string fullPath = Path.GetFullPath(Path.Combine(_basePath, filePath));
 
             if (!File.Exists(fullPath))
-            {
                 throw new Exception($"File tidak ditemukan: {fullPath}");
-            }
 
-            int port = GetNextPort(); // 🔥 ambil port
+            int port;
+
+            if (portInput.HasValue)
+            {
+                port = _portManager.ReservePort(portInput.Value);
+            }
+            else
+            {
+                port = _portManager.GetNextAvailablePort();
+            }
 
             var process = new Process();
             process.StartInfo.FileName = "jbang";
 
-            // 🔥 SUPPORT YAML + PORT
-            if (fullPath.EndsWith(".yaml") || fullPath.EndsWith(".yml"))
-            {
-                process.StartInfo.Arguments =
-                    $"camel@apache/camel run \"{fullPath}\" --property camel.main.restConfiguration.port={port}";
-            }
-            else
-            {
-                process.StartInfo.Arguments = $"run \"{fullPath}\"";
-            }
+            process.StartInfo.Arguments =
+                $"camel@apache/camel run \"{fullPath}\" --property camel.main.restConfiguration.port={port}";
 
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -193,7 +194,7 @@ namespace RepositoryPattern.Services.JbangService
             var job = new JbangJob
             {
                 Id = jobId,
-                Status = "running",
+                Status = "starting",
                 StartedAt = DateTime.Now,
                 Port = port,
                 FilePath = filePath
@@ -202,13 +203,14 @@ namespace RepositoryPattern.Services.JbangService
             _jobs[jobId] = job;
 
             process.Start();
-
             job.ProcessId = process.Id;
 
             Task.Run(async () =>
             {
                 try
                 {
+                    job.Status = "running";
+
                     string output = await process.StandardOutput.ReadToEndAsync();
                     string error = await process.StandardError.ReadToEndAsync();
 
@@ -222,9 +224,34 @@ namespace RepositoryPattern.Services.JbangService
                     job.Status = "failed";
                     job.Output = ex.Message;
                 }
+                finally
+                {
+                    // 🔥 RELEASE PORT
+                    _portManager.ReleasePort(job.Port);
+                }
             });
 
             return jobId;
+        }
+
+        private bool IsPortAvailable(int port)
+        {
+            return !System.Net.NetworkInformation.IPGlobalProperties
+                .GetIPGlobalProperties()
+                .GetActiveTcpListeners()
+                .Any(p => p.Port == port);
+        }
+
+        private int GetNextAvailablePort()
+        {
+            int port = 3000;
+
+            while (!IsPortAvailable(port))
+            {
+                port++;
+            }
+
+            return port;
         }
 
         public JbangJob GetStatus(string jobId)
@@ -248,25 +275,24 @@ namespace RepositoryPattern.Services.JbangService
             {
                 var process = Process.GetProcessById(job.ProcessId);
 
-                // 🔥 kill process
-                process.Kill();
+                if (!process.HasExited)
+                    process.Kill();
 
                 job.Status = "stopped";
 
-                // 🔥 hapus dari memory (opsional)
+                // 🔥 release port
+                _portManager.ReleasePort(job.Port);
+
                 _jobs.TryRemove(jobId, out _);
 
-                // 🔥 hapus dari MongoDB (kalau pakai)
-                // _collection.DeleteOne(x => x.Id == jobId);
-
-                return $"Job berhasil dihentikan (Port {job.Port} sudah free)";
+                return $"Job dihentikan, port {job.Port} dibebaskan";
             }
-            catch (Exception ex)
+            catch
             {
-                // 🔥 kalau process sudah tidak ada
+                _portManager.ReleasePort(job.Port);
                 _jobs.TryRemove(jobId, out _);
 
-                return $"Process tidak ditemukan / sudah selesai. {ex.Message}";
+                return "Process sudah selesai";
             }
         }
 
