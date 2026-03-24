@@ -70,5 +70,51 @@ namespace Beres.Server.Controllers
 
             return Ok(ResponseHelper.Success(result, "Folder berhasil dihapus"));
         }
+
+        [HttpPost("run")]
+        public IActionResult Run(string path)
+        {
+            var jobId = _service.RunJbang(path);
+
+            return Ok(ResponseHelper.Success(jobId, "Jbang started"));
+        }
+
+        [HttpGet("status")]
+        public IActionResult Status(string jobId)
+        {
+            var job = _service.GetStatus(jobId);
+
+            if (job == null)
+                return NotFound(ResponseHelper.Error("Job tidak ditemukan"));
+
+            return Ok(ResponseHelper.Success(job, "Status job"));
+        }
+
+        [HttpPost("stop")]
+        public IActionResult Stop(string jobId)
+        {
+            var result = _service.StopJob(jobId);
+
+            if (result.Contains("tidak ditemukan"))
+                return NotFound(ResponseHelper.Error(result));
+
+            return Ok(ResponseHelper.Success(result, "Job stopped"));
+        }
+
+        [HttpGet("jobs")]
+        public IActionResult GetAllJobs()
+        {
+            var jobs = _service.GetAllJobs();
+
+            return Ok(ResponseHelper.Success(jobs, "List semua job"));
+        }
+
+        [HttpPost("resume")]
+        public IActionResult Resume(string jobId)
+        {
+            var result = _service.ResumeJob(jobId);
+
+            return Ok(ResponseHelper.Success(result, "Job berhasil dijalankan ulang"));
+        }
     }
 }

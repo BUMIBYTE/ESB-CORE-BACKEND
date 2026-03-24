@@ -1,12 +1,19 @@
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Text.Json;
+using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace RepositoryPattern.Services.JbangService
 {
     public class JbangService : IJbangService
     {
         private readonly string _basePath;
+        private static ConcurrentDictionary<string, JbangJob> _jobs = new();
+
+        private static int _currentPort = 3000;
+        private static readonly object _lock = new();
+
 
         public JbangService(IConfiguration configuration)
         {
@@ -149,6 +156,144 @@ namespace RepositoryPattern.Services.JbangService
             Directory.Delete(fullPath);
 
             return $"Folder berhasil dihapus: {fullPath}";
+        }
+
+        public string RunJbang(string filePath)
+        {
+            var jobId = Guid.NewGuid().ToString();
+
+            string fullPath = Path.GetFullPath(Path.Combine(_basePath, filePath));
+
+            if (!File.Exists(fullPath))
+            {
+                throw new Exception($"File tidak ditemukan: {fullPath}");
+            }
+
+            int port = GetNextPort(); // 🔥 ambil port
+
+            var process = new Process();
+            process.StartInfo.FileName = "jbang";
+
+            // 🔥 SUPPORT YAML + PORT
+            if (fullPath.EndsWith(".yaml") || fullPath.EndsWith(".yml"))
+            {
+                process.StartInfo.Arguments =
+                    $"camel@apache/camel run \"{fullPath}\" --property camel.main.restConfiguration.port={port}";
+            }
+            else
+            {
+                process.StartInfo.Arguments = $"run \"{fullPath}\"";
+            }
+
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+
+            var job = new JbangJob
+            {
+                Id = jobId,
+                Status = "running",
+                StartedAt = DateTime.Now,
+                Port = port,
+                FilePath = filePath
+            };
+
+            _jobs[jobId] = job;
+
+            process.Start();
+
+            job.ProcessId = process.Id;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    string output = await process.StandardOutput.ReadToEndAsync();
+                    string error = await process.StandardError.ReadToEndAsync();
+
+                    await process.WaitForExitAsync();
+
+                    job.Output = string.IsNullOrEmpty(error) ? output : error;
+                    job.Status = process.ExitCode == 0 ? "finished" : "failed";
+                }
+                catch (Exception ex)
+                {
+                    job.Status = "failed";
+                    job.Output = ex.Message;
+                }
+            });
+
+            return jobId;
+        }
+
+        public JbangJob GetStatus(string jobId)
+        {
+            if (_jobs.ContainsKey(jobId))
+            {
+                return _jobs[jobId];
+            }
+
+            return null;
+        }
+
+        public string StopJob(string jobId)
+        {
+            if (!_jobs.ContainsKey(jobId))
+                return "Job tidak ditemukan";
+
+            var job = _jobs[jobId];
+
+            try
+            {
+                var process = Process.GetProcessById(job.ProcessId);
+
+                // 🔥 kill process
+                process.Kill();
+
+                job.Status = "stopped";
+
+                // 🔥 hapus dari memory (opsional)
+                _jobs.TryRemove(jobId, out _);
+
+                // 🔥 hapus dari MongoDB (kalau pakai)
+                // _collection.DeleteOne(x => x.Id == jobId);
+
+                return $"Job berhasil dihentikan (Port {job.Port} sudah free)";
+            }
+            catch (Exception ex)
+            {
+                // 🔥 kalau process sudah tidak ada
+                _jobs.TryRemove(jobId, out _);
+
+                return $"Process tidak ditemukan / sudah selesai. {ex.Message}";
+            }
+        }
+
+        public string ResumeJob(string jobId)
+        {
+            if (!_jobs.ContainsKey(jobId))
+                return "Job tidak ditemukan";
+
+            var oldJob = _jobs[jobId];
+
+            // 🔥 jalankan ulang dengan file yang sama
+            return RunJbang(oldJob.FilePath);
+        }
+
+        public List<JbangJob> GetAllJobs()
+        {
+            return _jobs.Values
+                .OrderByDescending(x => x.StartedAt)
+                .ToList();
+        }
+
+        private int GetNextPort()
+        {
+            lock (_lock)
+            {
+                return _currentPort++;
+            }
         }
     }
 }
