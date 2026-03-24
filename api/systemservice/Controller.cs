@@ -33,5 +33,13 @@ namespace Beres.Server.Controllers
             var memory = _SystemService.GetMemoryDetail();
             return Ok(ResponseHelper.Success(memory, "Memory Usage (MB)"));
         }
+
+        [HttpGet("server")]
+        public IActionResult Server()
+        {
+            var data = _SystemService.GetServerInfo();
+
+            return Ok(ResponseHelper.Success(data, "Server Details"));
+        }
     }
 }

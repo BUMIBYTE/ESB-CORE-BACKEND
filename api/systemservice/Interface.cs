@@ -5,6 +5,7 @@ public interface ISystemService
 
     Task<CpuInfo> GetCpuDetail();
     Task<MemoryInfo> GetMemoryDetail();
+    ServerInfo GetServerInfo();
 
 
 }

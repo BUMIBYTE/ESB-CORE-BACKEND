@@ -2,6 +2,9 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace RepositoryPattern.Services.SystemService
 {
@@ -118,6 +121,101 @@ namespace RepositoryPattern.Services.SystemService
         {
             var value = line.Split(':')[1].Trim().Replace(".", "");
             return double.Parse(value);
+        }
+
+        public ServerInfo GetServerInfo()
+        {
+            return new ServerInfo
+            {
+                OperatingSystem = GetOs(),
+                IpAddress = GetIp(),
+                CpuModel = GetCpuModel(),
+                Uptime = GetUptime(),
+                NetworkPeak = GetNetworkUsage()
+            };
+        }
+
+        private string RunCommand(string cmd)
+        {
+            var process = new Process();
+            process.StartInfo.FileName = "/bin/bash";
+            process.StartInfo.Arguments = $"-c \"{cmd}\"";
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+            string result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+
+            return result.Trim();
+        }
+
+        private string GetOs()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return RunCommand("lsb_release -d | cut -f2");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return RunCommand("sw_vers -productName && sw_vers -productVersion");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return Environment.OSVersion.ToString();
+
+            return "Unknown OS";
+        }
+
+        private string GetCpuModel()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return RunCommand("cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d ':' -f2");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return RunCommand("sysctl -n machdep.cpu.brand_string");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return RunCommand("wmic cpu get name");
+
+            return "Unknown CPU";
+        }
+
+        private string GetUptime()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return RunCommand("uptime -p");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return RunCommand("uptime");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return TimeSpan.FromMilliseconds(Environment.TickCount64).ToString();
+
+            return "Unknown";
+        }
+
+        private string GetIp()
+        {
+            return Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList
+                .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                ?.ToString();
+        }
+
+        private string GetNetworkUsage()
+        {
+            // simple snapshot (bukan realtime peak)
+            var ni = NetworkInterface.GetAllNetworkInterfaces()
+                .FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up &&
+                                     n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
+
+            if (ni == null) return "N/A";
+
+            var stats = ni.GetIPv4Statistics();
+
+            long totalBytes = stats.BytesSent + stats.BytesReceived;
+
+            double mb = totalBytes / 1024.0 / 1024.0;
+
+            return $"{Math.Round(mb, 2)} MB (total)";
         }
     }
 }
