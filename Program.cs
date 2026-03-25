@@ -89,11 +89,12 @@ builder.Services.AddSwaggerGen(c =>
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .WithExposedHeaders("*");
     });
 });
 
@@ -113,7 +114,13 @@ var app = builder.Build();
 // Routing & Middleware order
 app.UseRouting();
 
-app.UseCors("AllowAll");
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+);
+app.UseAuthentication();
+app.UseAuthorization();
 
 // 🔹 Swagger Aktif untuk semua environment
 app.UseSwagger();
@@ -148,9 +155,6 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsync(json);
     }
 });
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 
