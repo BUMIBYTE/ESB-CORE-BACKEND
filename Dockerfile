@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     openjdk-17-jdk \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # 🔥 Install JBang
@@ -23,6 +24,12 @@ RUN curl -Ls https://sh.jbang.dev | bash -s - app setup
 
 # 🔥 Set PATH supaya jbang dikenali .NET
 ENV PATH="/root/.jbang/bin:${PATH}"
+
+# 🔥 TRUST supaya tidak interactive (WAJIB untuk Docker)
+RUN jbang trust add https://github.com/apache/
+
+# 🔥 (Optional tapi bagus) preload camel biar tidak download saat runtime
+RUN jbang app install camel@apache/camel
 
 # 🔥 Working directory
 WORKDIR /app
