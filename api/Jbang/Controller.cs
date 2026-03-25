@@ -17,6 +17,20 @@ namespace Beres.Server.Controllers
             _service = service;
         }
 
+        [HttpGet("folders")]
+        public IActionResult GetRootFolders()
+        {
+            try
+            {
+                var data = _service.ReadRootFolders();
+                return Ok(ResponseHelper.Success(data, "List root folder"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHelper.Error(ex.Message));
+            }
+        }
+
         [HttpPost("folder")]
         public IActionResult CreateFolder(string name)
         {
@@ -39,6 +53,20 @@ namespace Beres.Server.Controllers
             var result = _service.ReadFile(path);
 
             return Ok(ResponseHelper.Success(result, "Berhasil membaca file"));
+        }
+
+        [HttpPut("file")]
+        public IActionResult UpdateFile([FromQuery] string path, [FromBody] string content)
+        {
+            try
+            {
+                var result = _service.UpdateFile(path, content);
+                return Ok(ResponseHelper.Success(result, "Update file"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHelper.Error(ex.Message));
+            }
         }
 
         [HttpGet("folder")]

@@ -45,6 +45,27 @@ namespace RepositoryPattern.Services.JbangService
             return $"Folder sudah ada: {fullPath}";
         }
 
+        public List<FolderItem> ReadRootFolders()
+        {
+            string fullPath = _basePath;
+
+            if (!Directory.Exists(fullPath))
+                throw new Exception("Base folder tidak ditemukan");
+
+            var folders = Directory.GetDirectories(fullPath)
+                .Select(d => new FolderItem
+                {
+                    Name = Path.GetFileName(d),
+                    Type = "folder",
+                    Size = null,
+                    CreatedAt = Directory.GetCreationTime(d)
+                })
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            return folders;
+        }
+
         // ✅ Create File + Write Content
         public string CreateFile(string folderPath, string fileName, string content)
         {
@@ -64,16 +85,43 @@ namespace RepositoryPattern.Services.JbangService
         }
 
         // ✅ Read File
-        public string ReadFile(string filePath)
+        public FileDetail ReadFile(string filePath)
         {
-            string fullPath = Path.Combine(_basePath, filePath);
+            if (filePath.Contains(".."))
+                throw new Exception("Path tidak valid");
+
+            string fullPath = Path.GetFullPath(Path.Combine(_basePath, filePath));
+
+            if (!fullPath.StartsWith(_basePath))
+                throw new Exception("Akses ditolak");
 
             if (!File.Exists(fullPath))
-            {
-                return "File tidak ditemukan";
-            }
+                throw new Exception("File tidak ditemukan");
 
-            return File.ReadAllText(fullPath);
+            return new FileDetail
+            {
+                FileName = Path.GetFileName(fullPath),
+                Path = filePath,
+                Content = File.ReadAllText(fullPath)
+            };
+        }
+
+        public string UpdateFile(string filePath, string newContent)
+        {
+            if (filePath.Contains(".."))
+                throw new Exception("Path tidak valid");
+
+            string fullPath = Path.GetFullPath(Path.Combine(_basePath, filePath));
+
+            if (!fullPath.StartsWith(_basePath))
+                throw new Exception("Akses ditolak");
+
+            if (!File.Exists(fullPath))
+                throw new Exception("File tidak ditemukan");
+
+            File.WriteAllText(fullPath, newContent);
+
+            return "File berhasil diupdate";
         }
 
         public object ReadFolder(string path)

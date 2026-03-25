@@ -1,0 +1,81 @@
+- route:
+    id: route-kafka-ke-sap
+    from:
+      uri: "kafka:sharepoint-ithaca-topic?brokers=10.123.45.4:9092"
+
+      steps:
+
+        - log:
+            id: log-terima-kafka
+            message: "DATA DITERIMA DARI KAFKA ${body}"
+
+        - setProperty:
+            id: simpan-payload-asli
+            name: originalPayload
+            simple: "${body}"
+
+        - setHeader:
+            id: buat-query-cek-db
+            name: CamelMongoDbCriteria
+            simple: "{ \"_id\": ${body[_id]} }"
+
+        - to:
+            id: cek-data-ithaca
+            uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=primakom&collection=ithacaDB&operation=findOneByQuery"
+
+        - choice:
+            id: validasi-data-db
+
+            when:
+              - simple: "${body} == null"
+                steps:
+
+                  - log:
+                      id: log-insert-db
+                      message: "DATA BELUM ADA → INSERT KE ithacaDB"
+
+                  - setBody:
+                      id: kembalikan-payload-asli
+                      simple: "${exchangeProperty.originalPayload}"
+
+                  - to:
+                      id: insert-ke-ithaca
+                      uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=primakom&collection=ithacaDB&operation=insert"
+
+                  - setProperty:
+                      id: buat-nomor-asset
+                      name: assetNumber
+                      simple: "${random(10000000,99999999)}"
+
+                  - log:
+                      id: log-nomor-asset
+                      message: "GENERATE NOMOR ASSET ${exchangeProperty.assetNumber}"
+
+                  - setHeader:
+                      id: buat-query-update
+                      name: CamelMongoDbCriteria
+                      simple: "{ \"_id\": ${exchangeProperty.originalPayload[_id]} }"
+
+                  - setBody:
+                      id: buat-payload-update
+                      simple: >
+                        {
+                          "$set": {
+                            "Asset_x0020_Number": "${exchangeProperty.assetNumber}"
+                          }
+                        }
+
+                  - log:
+                      id: log-update-primakomSH
+                      message: "UPDATE FIELD Asset_x0020_Number DI primakomSH"
+
+                  - to:
+                      id: update-primakomSH
+                      uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=primakom&collection=primakomSH&operation=update"
+
+            otherwise:
+              steps:
+
+                - log:
+                    id: log-data-sudah-ada-db
+                    message: "DATA SUDAH ADA DI ithacaDB → PROSES DIHENTIKA"

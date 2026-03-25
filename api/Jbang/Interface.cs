@@ -3,8 +3,11 @@ using System.Text.Json;
 public interface IJbangService
 {
     string CreateFolder(string path);
+    List<FolderItem> ReadRootFolders();
     string CreateFile(string folderPath, string fileName, string content);
-    string ReadFile(string filePath);
+    FileDetail ReadFile(string filePath);
+
+    string UpdateFile(string filePath, string newContent);
     object ReadFolder(string path);
     string DeleteFile(string path);
     string DeleteFolder(string path);
