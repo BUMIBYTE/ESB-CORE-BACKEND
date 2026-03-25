@@ -69,6 +69,20 @@ namespace Beres.Server.Controllers
             }
         }
 
+        [HttpGet("file/versions")]
+        public IActionResult GetVersions(string path)
+        {
+            var data = _service.GetFileVersions(path);
+            return Ok(ResponseHelper.Success(data, "List version"));
+        }
+
+        [HttpPost("file/restore")]
+        public IActionResult Restore(string path, string version)
+        {
+            var result = _service.RestoreVersion(path, version);
+            return Ok(ResponseHelper.Success(result, "Restore file"));
+        }
+
         [HttpGet("folder")]
         public IActionResult ReadFolder(string path = "")
         {

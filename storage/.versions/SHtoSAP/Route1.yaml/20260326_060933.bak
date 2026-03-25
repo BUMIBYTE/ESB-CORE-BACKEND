@@ -9,7 +9,7 @@
       steps:
 
         - log:
-            id: log-mulai-pollin
+            id: log-mulai-polling
             message: "MEMULAI POLLING DATA SHAREPOINT"
 
         - setHeader:

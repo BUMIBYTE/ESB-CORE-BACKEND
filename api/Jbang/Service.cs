@@ -106,22 +106,94 @@ namespace RepositoryPattern.Services.JbangService
             };
         }
 
+        // 🔥 UPDATE FILE + VERSIONING
         public string UpdateFile(string filePath, string newContent)
+        {
+            ValidatePath(filePath);
+
+            string fullPath = GetFullPath(filePath);
+
+            if (!File.Exists(fullPath))
+                throw new Exception("File tidak ditemukan");
+
+            // 🔥 ambil info file
+            string fileName = Path.GetFileName(filePath);
+            string folderPath = Path.GetDirectoryName(filePath) ?? "";
+
+            // 🔥 version folder
+            string versionFolder = Path.Combine(_basePath, ".versions", folderPath, fileName);
+
+            if (!Directory.Exists(versionFolder))
+            {
+                Directory.CreateDirectory(versionFolder);
+            }
+
+            // 🔥 backup lama
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string backupFile = Path.Combine(versionFolder, $"{timestamp}.bak");
+
+            File.Copy(fullPath, backupFile, true);
+
+            // 🔥 tulis content baru
+            File.WriteAllText(fullPath, newContent);
+
+            return $"File berhasil diupdate (backup: {timestamp})";
+        }
+
+        // 🔥 LIST VERSION
+        public List<string> GetFileVersions(string filePath)
+        {
+            ValidatePath(filePath);
+
+            string fileName = Path.GetFileName(filePath);
+            string folderPath = Path.GetDirectoryName(filePath) ?? "";
+
+            string versionFolder = Path.Combine(_basePath, ".versions", folderPath, fileName);
+
+            if (!Directory.Exists(versionFolder))
+                return new List<string>();
+
+            return Directory.GetFiles(versionFolder)
+                .Select(f => Path.GetFileName(f))
+                .OrderByDescending(x => x)
+                .ToList();
+        }
+
+        // 🔥 RESTORE VERSION (UNDO)
+        public string RestoreVersion(string filePath, string versionFile)
+        {
+            ValidatePath(filePath);
+
+            string fullPath = GetFullPath(filePath);
+
+            string fileName = Path.GetFileName(filePath);
+            string folderPath = Path.GetDirectoryName(filePath) ?? "";
+
+            string versionPath = Path.Combine(_basePath, ".versions", folderPath, fileName, versionFile);
+
+            if (!File.Exists(versionPath))
+                throw new Exception("Version tidak ditemukan");
+
+            File.Copy(versionPath, fullPath, true);
+
+            return "File berhasil di-restore";
+        }
+
+        // 🔒 VALIDATION
+        private void ValidatePath(string filePath)
         {
             if (filePath.Contains(".."))
                 throw new Exception("Path tidak valid");
+        }
 
+        private string GetFullPath(string filePath)
+        {
             string fullPath = Path.GetFullPath(Path.Combine(_basePath, filePath));
 
             if (!fullPath.StartsWith(_basePath))
                 throw new Exception("Akses ditolak");
 
-            if (!File.Exists(fullPath))
-                throw new Exception("File tidak ditemukan");
-
-            File.WriteAllText(fullPath, newContent);
-
-            return "File berhasil diupdate";
+            return fullPath;
         }
 
         public object ReadFolder(string path)

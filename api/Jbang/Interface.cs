@@ -8,6 +8,10 @@ public interface IJbangService
     FileDetail ReadFile(string filePath);
 
     string UpdateFile(string filePath, string newContent);
+
+    List<string> GetFileVersions(string filePath);
+    string RestoreVersion(string filePath, string versionFile);
+
     object ReadFolder(string path);
     string DeleteFile(string path);
     string DeleteFolder(string path);
