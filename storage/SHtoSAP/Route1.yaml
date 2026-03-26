@@ -19,7 +19,7 @@
 
         - to:
             id: panggil-api-sharepoint
-            uri: "http://10.123.45.4:5000/api/v1/primakom/sharepoint"
+            uri: "http://10.1.1.156:5000/api/v1/primakom/sharepoint"
 
         - unmarshal:
             id: konversi-json
@@ -58,7 +58,7 @@
 
                         - to:
                             id: cek-duplikasi-ithaca
-                            uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=primakom&collection=ithacaDB&operation=findOneByQuery"
+                            uri: "mongodb:client?hosts=10.1.1.136:27017&username=root&password=%21asiwmcll32kk489522039481&database=itacha&collection=ithacaDB&operation=findOneByQuery"
 
                         - choice:
                             id: validasi-duplikasi
@@ -92,7 +92,7 @@
 
                                   - to:
                                       id: kirim-ke-kafka
-                                      uri: "kafka:sharepoint-ithaca-topic?brokers=10.123.45.4:9092"
+                                      uri: "kafka:sharepoint-ithaca-topic?brokers=10.1.1.156:9092"
 
                             otherwise:
                               steps:
