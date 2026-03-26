@@ -8,7 +8,7 @@ namespace Beres.Server.Controllers
 {
     // [Authorize]
     [ApiController]
-    [Route("api/v1/primakom")]
+    [Route("api/v1/[controller]")]
     public class RedPayController : ControllerBase
     {
         private readonly IRedPayService _RedPayService;
