@@ -59,7 +59,7 @@ builder.Services.AddAuthentication(options =>
 // Swagger Config
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Primakom", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Primacom", Version = "v1" });
     c.OperationFilter<SwaggerFileOperationFilter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
