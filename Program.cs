@@ -127,7 +127,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Primakom API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Primacom API V1");
 });
 
 // app.UseHttpsRedirection();
