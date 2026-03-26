@@ -179,6 +179,26 @@ namespace RepositoryPattern.Services.JbangService
             return "File berhasil di-restore";
         }
 
+        public FileDetail ReadVersion(string filePath, string versionFile)
+        {
+            ValidatePath(filePath);
+
+            string fileName = Path.GetFileName(filePath);
+            string folderPath = Path.GetDirectoryName(filePath) ?? "";
+
+            string versionPath = Path.Combine(_basePath, ".versions", folderPath, fileName, versionFile);
+
+            if (!File.Exists(versionPath))
+                throw new Exception("Version tidak ditemukan");
+
+            return new FileDetail
+            {
+                FileName = fileName,
+                Path = filePath,
+                Content = File.ReadAllText(versionPath)
+            };
+        }
+
         // 🔒 VALIDATION
         private void ValidatePath(string filePath)
         {

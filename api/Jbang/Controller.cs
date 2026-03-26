@@ -83,6 +83,20 @@ namespace Beres.Server.Controllers
             return Ok(ResponseHelper.Success(result, "Restore file"));
         }
 
+        [HttpGet("file/read-version")]
+        public IActionResult ReadVersion(string path, string version)
+        {
+            try
+            {
+                var data = _service.ReadVersion(path, version);
+                return Ok(ResponseHelper.Success(data, "Read version"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHelper.Error(ex.Message));
+            }
+        }
+
         [HttpGet("folder")]
         public IActionResult ReadFolder(string path = "")
         {

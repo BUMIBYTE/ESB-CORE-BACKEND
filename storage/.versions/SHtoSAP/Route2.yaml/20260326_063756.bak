@@ -78,4 +78,4 @@
 
                 - log:
                     id: log-data-sudah-ada-db
-                    message: "DATA SUDAH ADA DI ithacaDB → PROSES DIHENTIKAN dan BAIK"
+                    message: "DATA SUDAH ADA DI ithacaDB → PROSES DIHENTIK"

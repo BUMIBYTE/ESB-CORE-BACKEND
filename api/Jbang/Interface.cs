@@ -11,6 +11,7 @@ public interface IJbangService
 
     List<string> GetFileVersions(string filePath);
     string RestoreVersion(string filePath, string versionFile);
+    FileDetail ReadVersion(string filePath, string versionFile);
 
     object ReadFolder(string path);
     string DeleteFile(string path);
