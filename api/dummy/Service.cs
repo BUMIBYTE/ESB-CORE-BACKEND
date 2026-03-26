@@ -14,10 +14,10 @@ namespace RepositoryPattern.Services.RedPayService
         public RedPayService(IConfiguration configuration)
         {
             var mongoClient = new MongoClient(configuration.GetConnectionString("ConnectionURI"));
-            var database = mongoClient.GetDatabase("primakom");
-            _collection = database.GetCollection<BsonDocument>("primakomSH");
-            _collectionEsb = database.GetCollection<BsonDocument>("primakomESB");
-            _collectionSAP = database.GetCollection<BsonDocument>("primakomSAP");
+            var database = mongoClient.GetDatabase("itacha");
+            _collection = database.GetCollection<BsonDocument>("Sharepoint");
+            _collectionEsb = database.GetCollection<BsonDocument>("ESB");
+            _collectionSAP = database.GetCollection<BsonDocument>("SAP");
 
 
         }
