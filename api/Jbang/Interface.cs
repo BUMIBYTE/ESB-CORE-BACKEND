@@ -18,6 +18,7 @@ public interface IJbangService
     string DeleteFolder(string path);
 
     string RunJbang(string filePath, int? port = null);
+    List<string> GetLogs(string jobId);
     string StopJob(string jobId);
     string ResumeJob(string jobId);
     JbangJob GetStatus(string jobId);

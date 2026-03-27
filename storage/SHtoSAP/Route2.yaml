@@ -1,7 +1,7 @@
 - route:
     id: route-kafka-ke-sap
     from:
-      uri: "kafka:sharepoint-ithaca-topic?brokers=10.123.45.5:9092"
+      uri: "kafka:sharepoint-ithaca-topic?brokers=10.123.45.4:9092"
 
       steps:
 

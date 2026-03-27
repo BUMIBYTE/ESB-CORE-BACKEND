@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryPattern.Services.JbangService;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace Beres.Server.Controllers
     public class JbangController : ControllerBase
     {
         private readonly IJbangService _service;
+        private static ConcurrentDictionary<string, JbangJob> _jobs = new();
 
         public JbangController(IJbangService service)
         {
@@ -139,6 +141,20 @@ namespace Beres.Server.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ResponseHelper.Error(ex.Message));
+            }
+        }
+
+        [HttpGet("logs/{jobId}")]
+        public IActionResult GetLogs(string jobId)
+        {
+            try
+            {
+                var logs = _service.GetLogs(jobId);
+                return Ok(logs);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
             }
         }
 

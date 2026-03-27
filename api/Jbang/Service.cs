@@ -309,20 +309,13 @@ namespace RepositoryPattern.Services.JbangService
             if (!File.Exists(fullPath))
                 throw new Exception($"File tidak ditemukan: {fullPath}");
 
-            int port;
-
-            if (portInput.HasValue)
-            {
-                port = _portManager.ReservePort(portInput.Value);
-            }
-            else
-            {
-                port = _portManager.GetNextAvailablePort();
-            }
+            int port = portInput.HasValue
+                ? _portManager.ReservePort(portInput.Value)
+                : _portManager.GetNextAvailablePort();
 
             var process = new Process();
-            process.StartInfo.FileName = "jbang";
 
+            process.StartInfo.FileName = "jbang";
             process.StartInfo.Arguments =
                 $"camel@apache/camel run \"{fullPath}\" --property camel.main.restConfiguration.port={port}";
 
@@ -337,13 +330,41 @@ namespace RepositoryPattern.Services.JbangService
                 Status = "starting",
                 StartedAt = DateTime.Now,
                 Port = port,
-                FilePath = filePath
+                FilePath = filePath,
+                Logs = new List<string>()
             };
 
             _jobs[jobId] = job;
 
+            // 🔥 HANDLE STDOUT
+            process.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    lock (job)
+                    {
+                        job.Logs.Add(args.Data);
+                    }
+                }
+            };
+
+            // 🔥 HANDLE STDERR
+            process.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    lock (job)
+                    {
+                        job.Logs.Add("[ERROR] " + args.Data);
+                    }
+                }
+            };
+
             process.Start();
             job.ProcessId = process.Id;
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
             Task.Run(async () =>
             {
@@ -351,27 +372,30 @@ namespace RepositoryPattern.Services.JbangService
                 {
                     job.Status = "running";
 
-                    string output = await process.StandardOutput.ReadToEndAsync();
-                    string error = await process.StandardError.ReadToEndAsync();
-
                     await process.WaitForExitAsync();
 
-                    job.Output = string.IsNullOrEmpty(error) ? output : error;
                     job.Status = process.ExitCode == 0 ? "finished" : "failed";
                 }
                 catch (Exception ex)
                 {
                     job.Status = "failed";
-                    job.Output = ex.Message;
+                    job.Logs.Add("[EXCEPTION] " + ex.Message);
                 }
                 finally
                 {
-                    // 🔥 RELEASE PORT
                     _portManager.ReleasePort(job.Port);
                 }
             });
 
             return jobId;
+        }
+
+        public List<string> GetLogs(string jobId)
+        {
+            if (!_jobs.TryGetValue(jobId, out var job))
+                throw new Exception("Job tidak ditemukan");
+
+            return [.. job.Logs.TakeLast(100)];
         }
 
         private bool IsPortAvailable(int port)
@@ -461,5 +485,7 @@ namespace RepositoryPattern.Services.JbangService
                 return _currentPort++;
             }
         }
+
+        
     }
 }

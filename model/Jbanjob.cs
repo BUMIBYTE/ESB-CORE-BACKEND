@@ -7,4 +7,5 @@ public class JbangJob
     public DateTime StartedAt { get; set; }
     public int Port { get; set; } // 👈 tambah ini
     public string FilePath { get; set; }
+    public List<string> Logs { get; set; } = new();
 }

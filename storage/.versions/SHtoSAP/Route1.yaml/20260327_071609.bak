@@ -3,7 +3,7 @@
     from:
       uri: timer:sharepoint
       parameters:
-        period: "30000"
+        period: "5000"
         delay: "1000"
 
       steps:
