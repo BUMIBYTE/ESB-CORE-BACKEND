@@ -66,21 +66,25 @@ namespace RepositoryPattern.Services.SystemService
 
         public async Task<MemoryInfo> GetMemoryDetail()
         {
-            var process = new Process();
-            process.StartInfo.FileName = "/bin/bash";
-            process.StartInfo.Arguments = "-c \"vm_stat\"";
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return await GetMacMemory();
 
-            process.Start();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return await GetLinuxMemory();
 
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return await GetWindowsMemory();
 
-            // parsing vm_stat
+            throw new NotSupportedException("OS tidak didukung");
+        }
+
+        private async Task<MemoryInfo> GetMacMemory()
+        {
+            var output = await RunCommand("/bin/bash", "-c \"vm_stat\"");
+
             var lines = output.Split('\n');
 
-            double pageSize = 4096; // default macOS
+            double pageSize = 4096;
             double free = 0;
             double active = 0;
             double inactive = 0;
@@ -117,10 +121,89 @@ namespace RepositoryPattern.Services.SystemService
             };
         }
 
+        private async Task<MemoryInfo> GetLinuxMemory()
+        {
+            var output = await RunCommand("/bin/bash", "-c \"cat /proc/meminfo\"");
+
+            double totalKb = ParseMeminfo(output, "MemTotal");
+            double freeKb = ParseMeminfo(output, "MemFree");
+            double availableKb = ParseMeminfo(output, "MemAvailable");
+
+            double totalMb = totalKb / 1024;
+            double freeMb = freeKb / 1024;
+            double availableMb = availableKb / 1024;
+            double usedMb = totalMb - availableMb;
+
+            return new MemoryInfo
+            {
+                Total = Math.Round(totalMb, 2),
+                Used = Math.Round(usedMb, 2),
+                Free = Math.Round(freeMb, 2),
+                Available = Math.Round(availableMb, 2)
+            };
+        }
+
+        private async Task<MemoryInfo> GetWindowsMemory()
+        {
+            var output = await RunCommand("wmic", "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value");
+
+            double totalKb = ParseValue(output, "TotalVisibleMemorySize");
+            double freeKb = ParseValue(output, "FreePhysicalMemory");
+
+            double totalMb = totalKb / 1024;
+            double freeMb = freeKb / 1024;
+            double usedMb = totalMb - freeMb;
+
+            return new MemoryInfo
+            {
+                Total = Math.Round(totalMb, 2),
+                Used = Math.Round(usedMb, 2),
+                Free = Math.Round(freeMb, 2),
+                Available = Math.Round(freeMb, 2)
+            };
+        }
+
+        private async Task<string> RunCommand(string fileName, string args)
+        {
+            var process = new Process();
+            process.StartInfo.FileName = fileName;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.UseShellExecute = false;
+
+            process.Start();
+
+            string result = await process.StandardOutput.ReadToEndAsync();
+            process.WaitForExit();
+
+            return result;
+        }
+
         private double ParseVm(string line)
         {
-            var value = line.Split(':')[1].Trim().Replace(".", "");
-            return double.Parse(value);
+            var parts = line.Split(':');
+            return double.Parse(parts[1].Trim().Replace(".", ""));
+        }
+
+        private double ParseMeminfo(string text, string key)
+        {
+            var line = text.Split('\n')
+                           .FirstOrDefault(x => x.StartsWith(key));
+
+            if (line == null) return 0;
+
+            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return double.Parse(parts[1]);
+        }
+
+        private double ParseValue(string text, string key)
+        {
+            var line = text.Split('\n')
+                           .FirstOrDefault(x => x.StartsWith(key));
+
+            if (line == null) return 0;
+
+            return double.Parse(line.Split('=')[1].Trim());
         }
 
         public ServerInfo GetServerInfo()
