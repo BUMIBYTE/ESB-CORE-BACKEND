@@ -317,11 +317,7 @@ namespace RepositoryPattern.Services.JbangService
 
             process.StartInfo.FileName = "jbang";
             process.StartInfo.Arguments =
-                $"org.apache.camel:camel-main \"{fullPath}\" " +
-                $"--dep=org.apache.camel:camel-yaml-dsl " +
-                $"--dep=org.apache.camel:camel-kafka " +
-                $"--dep=org.apache.camel:camel-http " +
-                $"--property camel.main.restConfiguration.port={port}";
+                $"camel@apache/camel run \"{fullPath}\" --property camel.main.restConfiguration.port={port}";
 
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -490,6 +486,6 @@ namespace RepositoryPattern.Services.JbangService
             }
         }
 
-
+        
     }
 }
