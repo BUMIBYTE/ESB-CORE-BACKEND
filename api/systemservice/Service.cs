@@ -78,6 +78,37 @@ namespace RepositoryPattern.Services.SystemService
             throw new NotSupportedException("OS tidak didukung");
         }
 
+        public async Task<StorageInfo> GetStorageDetail()
+        {
+            DriveInfo drive;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                drive = DriveInfo.GetDrives()
+                    .FirstOrDefault(d => d.IsReady && d.Name == "C:\\");
+            }
+            else
+            {
+                drive = DriveInfo.GetDrives()
+                    .FirstOrDefault(d => d.IsReady && d.Name == "/");
+            }
+
+            if (drive == null)
+                throw new Exception("Disk tidak ditemukan");
+
+            double total = drive.TotalSize / 1024.0 / 1024.0 / 1024.0; // GB
+            double free = drive.AvailableFreeSpace / 1024.0 / 1024.0 / 1024.0; // GB
+            double used = total - free;
+
+            return new StorageInfo
+            {
+                Total = Math.Round(total, 2),
+                Used = Math.Round(used, 2),
+                Free = Math.Round(free, 2),
+                Available = Math.Round(free, 2)
+            };
+        }
+
         private async Task<MemoryInfo> GetMacMemory()
         {
             var output = await RunCommand("/bin/bash", "-c \"vm_stat\"");

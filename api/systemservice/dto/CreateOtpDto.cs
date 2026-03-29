@@ -13,6 +13,14 @@ public class MemoryInfo
     public double Available { get; set; }
 }
 
+public class StorageInfo
+{
+    public double Total { get; set; }
+    public double Used { get; set; }
+    public double Free { get; set; }
+    public double Available { get; set; }
+}
+
 public class ServerInfo
 {
     public string OperatingSystem { get; set; }

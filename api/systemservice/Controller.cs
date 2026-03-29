@@ -34,6 +34,13 @@ namespace Beres.Server.Controllers
             return Ok(ResponseHelper.Success(memory, "Memory Usage (MB)"));
         }
 
+        [HttpGet("storage")]
+        public IActionResult Storage()
+        {
+            var storage = _SystemService.GetStorageDetail();
+            return Ok(ResponseHelper.Success(storage, "Storage Usage (MB)"));
+        }
+
         [HttpGet("server")]
         public IActionResult Server()
         {
