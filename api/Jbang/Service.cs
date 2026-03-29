@@ -316,10 +316,15 @@ namespace RepositoryPattern.Services.JbangService
             var process = new Process();
 
             process.StartInfo.FileName = "jbang";
+            var deps = string.Join(" ",
+                "--dep=org.apache.camel:camel-yaml-dsl",
+                "--dep=org.apache.camel:camel-kamelet",
+                "--dep=org.apache.camel:camel-kafka",
+                "--dep=org.apache.camel:camel-http"
+            );
+
             process.StartInfo.Arguments =
-                $"camel@apache/camel run \"{fullPath}\" " +
-                $"--deps=org.apache.camel:camel-yaml-dsl " +
-                $"--deps=org.apache.camel:camel-kafka " +
+                $"camel@apache/camel run \"{fullPath}\" {deps} " +
                 $"--property camel.main.restConfiguration.port={port}";
 
             process.StartInfo.RedirectStandardOutput = true;
