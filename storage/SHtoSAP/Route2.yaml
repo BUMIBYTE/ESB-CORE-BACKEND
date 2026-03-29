@@ -1,7 +1,7 @@
 - route:
     id: route-kafka-ke-sap
     from:
-      uri: "kafka:sharepoint-ithaca-topic?brokers=10.123.45.4:9092"
+      uri: "kafka:sharepoint-ithaca-topic?brokers=76.13.193.33:9092"
 
       steps:
 
@@ -21,7 +21,7 @@
 
         - to:
             id: cek-data-ithaca
-            uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=itacha&collection=ithacaDB&operation=findOneByQuery"
+            uri: "mongodb:client?hosts=76.13.193.33:27017&username=root&password=%21asiwmcll32kk489522039481%21%21&database=itacha&collection=ithacaDB&operation=findOneByQuery"
 
         - choice:
             id: validasi-data-db
@@ -40,7 +40,7 @@
 
                   - to:
                       id: insert-ke-ithaca
-                      uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=itacha&collection=ithacaDB&operation=insert"
+                      uri: "mongodb:client?hosts=76.13.193.33:27017&username=root&password=%21asiwmcll32kk489522039481%21%21&database=itacha&collection=ithacaDB&operation=insert"
 
                   - setProperty:
                       id: buat-nomor-asset
@@ -71,7 +71,7 @@
 
                   - to:
                       id: update-primakomSH
-                      uri: "mongodb:client?hosts=10.123.45.5:27017&username=root&password=%21asiwmcll32kk489522039481&database=itacha&collection=Sharepoint&operation=update"
+                      uri: "mongodb:client?hosts=76.13.193.33:27017&username=root&password=%21asiwmcll32kk489522039481%21%21&database=itacha&collection=Sharepoint&operation=update"
 
             otherwise:
               steps:
