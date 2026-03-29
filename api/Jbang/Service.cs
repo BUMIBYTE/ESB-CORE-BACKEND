@@ -317,8 +317,7 @@ namespace RepositoryPattern.Services.JbangService
 
             process.StartInfo.FileName = "jbang";
             process.StartInfo.Arguments =
-                $"camel@apache/camel run \"{fullPath}\" " +
-                $"--runtime=main " +
+                $"org.apache.camel:camel-main \"{fullPath}\" " +
                 $"--dep=org.apache.camel:camel-yaml-dsl " +
                 $"--dep=org.apache.camel:camel-kafka " +
                 $"--dep=org.apache.camel:camel-http " +
@@ -491,6 +490,6 @@ namespace RepositoryPattern.Services.JbangService
             }
         }
 
-        
+
     }
 }
