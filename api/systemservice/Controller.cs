@@ -8,7 +8,7 @@ namespace Beres.Server.Controllers
 {
     // [Authorize]
     [ApiController]
-    [Route("api/v1/primakom")]
+    [Route("api/v1/primacom")]
     public class SystemController : ControllerBase
     {
         private readonly ISystemService _SystemService;

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http.Features;
 using RepositoryPattern.Services.RedPayService;
 using RepositoryPattern.Services.JbangService;
 using RepositoryPattern.Services.SystemService;
+using RepositoryPattern.Services.AuthService;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ builder.Services.AddSingleton<ConvertJWT>();
 builder.Services.AddScoped<IRedPayService, RedPayService>();
 builder.Services.AddScoped<IJbangService, JbangService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

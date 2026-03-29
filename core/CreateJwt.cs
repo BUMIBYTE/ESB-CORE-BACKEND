@@ -31,10 +31,10 @@ public class JwtService
                 new Claim(ClaimTypes.Name, id),
                 new Claim(JwtRegisteredClaimNames.Sub, id),
             }),
-            Expires = DateTime.UtcNow.AddDays(90),
+            Expires = DateTime.UtcNow.AddDays(30),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keys), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = "Beres.com",
-            Audience = "Beres.com",
+            Issuer = "Primakom.com",
+            Audience = "Primakom.com",
         };
 
         return tokenDescriptor;
