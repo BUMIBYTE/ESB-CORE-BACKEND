@@ -1,0 +1,69 @@
+- route:
+    id: route-kafka-ke-sap
+    from:
+      uri: "kafka:sharepoint-ithaca-topic?brokers=76.13.193.33:9092"
+
+      steps:
+
+        # 🔹 Log masuk
+        - log:
+            message: "DATA MASUK: ${body}"
+
+        # 🔥 Parse JSON
+        - unmarshal:
+            json:
+              library: Jackson
+
+        # 🔹 Simpan object asli
+        - setProperty:
+            name: originalPayload
+            simple: "${body}"
+
+        # 🔹 Query Mongo (pakai object)
+        - setHeader:
+            name: CamelMongoDbCriteria
+            simple: "{ \"DESCRIPT\": \"${body[DESCRIPT]}\" }"
+
+        - to:
+            uri: "mongodb:client?hosts=76.13.193.33:27017&username=root&password=%21asiwmcll32kk489522039481%21%21&database=itacha&collection=ithacaDB&operation=findOneByQuery"
+
+        - choice:
+            when:
+              - simple: "${body} == null"
+                steps:
+
+                  - log:
+                      message: "DATA BELUM ADA → INSERT & PUSH"
+
+                  # 🔹 Ambil payload asli
+                  - setBody:
+                      simple: "${exchangeProperty.originalPayload}"
+
+                  # 🔥 Convert ke JSON string
+                  - marshal:
+                      json:
+                        library: Jackson
+
+                  # 🔹 Header HTTP
+                  - setHeader:
+                      name: Content-Type
+                      constant: "application/json"
+
+                  - setHeader:
+                      name: CamelHttpMethod
+                      constant: POST
+
+                  # 🔥 FIX endpoint
+                  - to:
+                      uri: "http://0.0.0.0:5001/api/v1/dummy/pushtosap?throwExceptionOnFailure=false"
+
+                  - log:
+                      message: "STATUS: ${header.CamelHttpResponseCode}"
+
+                  - log:
+                      message: "RESPONSE: ${body}"
+
+            otherwise:
+              steps:
+                - log:
+                    message: "DATA SUDAH ADA → SKIP"

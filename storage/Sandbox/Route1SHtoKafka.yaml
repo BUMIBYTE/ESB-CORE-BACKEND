@@ -1,0 +1,68 @@
+- route:
+    id: route-1774828490
+    from:
+      uri: "timer:tick?period=30000"
+      steps:
+        - setHeader:
+            name: Authorization
+            constant: Basic sajkajshdjj11n1knbjkbd
+        - to:
+            id: Endpoint Sharepoint
+            uri: "http://0.0.0.0:5001/api/v1/dummy/sharepoint"
+        - unmarshal:
+            id: Result Object ke JSON
+            json:
+              library: Jackson
+        - split:
+            id: Ambil data JSON
+            simple: "${body[data]}"
+            steps:
+              - choice:
+                  id: Filter ECCASApp0 == 16
+                  when:
+                    - simple: "${body[ECCASApp0]} == 16"
+                      steps:
+                        - setProperty:
+                            name: originalDoc
+                            simple: "${body}"
+                        - setHeader:
+                            name: CamelMongoDbCriteria
+                            simple: "{ \"_id\": ${body[ID]} }"
+                        - to:
+                            id: cek-duplikasi-ithaca
+                            uri: "mongodb:client?hosts=76.13.193.33:27017&username=root&password=%21asiwmcll32kk489522039481%21%21&database=itacha&collection=ithacaDB&operation=findOneByQuery"
+                        - choice:
+                            id: validasi-duplikasi
+                            when:
+                              - simple: "${body} == null"
+                                steps:
+                                  - setBody:
+                                      id: setBody-g25n
+                                      simple: >
+                                        {
+                                          "_id": ${exchangeProperty.originalDoc[ID]},
+                                          "COMPANYCODE": "${exchangeProperty.originalDoc[Company_x0020_Code]}",
+                                          "ASSETCLASS": "${exchangeProperty.originalDoc[Asset_x0020_Class]}",
+                                          "DESCRIPT": "${exchangeProperty.originalDoc[Asset_x0020_Description]}",
+                                          "COSTCENTER": "${exchangeProperty.originalDoc[Cost_x0020_Center]}",
+                                          "PLANT": "${exchangeProperty.originalDoc[Plant]}",
+                                          "ULIFE_BOOK": "${exchangeProperty.originalDoc[Use_x0020_of_x0020_Life_x0020__x]}",
+                                          "ULIFE_TAX": "${exchangeProperty.originalDoc[Use_x0020_of_x0020_Life_x0020__x0]}",
+                                          "ULIFE_IFRS": "${exchangeProperty.originalDoc[Use_x0020_of_x0020_Life_x0020__x1]}"
+                                        }
+                                  - to:
+                                      id: kirim-ke-kafka
+                                      uri: "kafka:sharepoint-ithaca-topic?brokers=76.13.193.33:9092"
+                                  - log:
+                                      id: log-6f4h
+                                      message: berhasil kirim ke kafka
+                            otherwise:
+                              steps:
+                                - log:
+                                    id: log-data-tidak-valid-1
+                                    message: log-data-tidak-valid-1
+                  otherwise:
+                    steps:
+                      - log:
+                          id: log-data-tidak-valid-2
+                          message: log-data-tidak-valid-2

@@ -1,0 +1,65 @@
+- route:
+    id: route-kafka-ke-sap
+    from:
+      uri: "kafka:sharepoint-ithaca-topic?brokers=76.13.193.33:9092"
+
+      steps:
+
+        - log:
+            message: "DATA MASUK: ${body}"
+
+        - unmarshal:
+            json:
+              library: Jackson
+
+        - setProperty:
+            name: originalPayload
+            simple: "${body}"
+
+        - log:
+            message: "Push ke API .NET"
+
+        - setHeader:
+            name: Content-Type
+            constant: "application/json"
+
+        - setHeader:
+            name: CamelHttpMethod
+            constant: POST
+
+        # 🔥 INI KUNCI FIX
+        - marshal:
+            json:
+              library: Jackson
+
+        - setHeader:
+            name: CamelMongoDbCriteria
+            simple: "{ \"_id\": \"${body[_id]}\" }"
+
+        - to:
+            uri: "mongodb:client?hosts=76.13.193.33:27017&database=itacha&collection=ithacaDB&operation=findOneByQuery"
+
+        - choice:
+            when:
+              - simple: "${body} == null"
+                steps:
+
+                  - log:
+                      message: "INSERT DATA"
+
+                  - setBody:
+                      simple: "${exchangeProperty.originalPayload}"
+
+                  - to:
+                        uri: "http://0.0.0.0:5001/api/v1/dummy/pushtosap?throwExceptionOnFailure=false"
+
+                  - log:
+                        message: "STATUS: ${header.CamelHttpResponseCode}"
+
+                  - log:
+                        message: "RESPONSE: ${body}"
+
+            otherwise:
+              steps:
+                - log:
+                    message: "DATA SUDAH ADA"
