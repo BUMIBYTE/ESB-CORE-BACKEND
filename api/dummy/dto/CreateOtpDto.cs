@@ -1,32 +1,4 @@
-public class CreateRedpayDto
-{
-    public string Company { get; set; }
-    public string Category { get; set; }
-    public string Website { get; set; }
-    public string PhoneNumber { get; set; }
-    public string Email { get; set; }
-    public string? PaymentMethod { get; set; }
-    public string? Currency { get; set; }
-    public string? Delegate { get; set; }
-    public string? Diskon { get; set; }
-    public List<CreateMemberOrder>? MemberOrder { get; set; }
-}
 
-public class ApprovedRedpayDto
-{
-    public string? merchant_transaction_id { get; set; }
-    public string? status { get; set; }
-}
-
-public class PreviewRedpayDto
-{
-    public double? Amount { get; set; }
-    public double? Participant { get; set; }
-    public string? Delegate { get; set; }
-    public string? Diskon { get; set; }
-
-
-}
 
 public class CreateMemberOrder
 {
@@ -37,23 +9,39 @@ public class CreateMemberOrder
     public string? PhoneNumber { get; set; }
 }
 
-public class GetRedpayDto
+public class Asset
 {
-    public string? IdOrder { get; set; }
-
+    public string COMPANYCODE { get; set; }
+    public string ASSETCLASS { get; set; }
+    public string DESCRIPT { get; set; }
+    public string COSTCENTER { get; set; }
+    public string PLANT { get; set; }
+    public string ULIFE_BOOK { get; set; }
+    public string ULIFE_TAX { get; set; }
+    public string ULIFE_IFRS { get; set; }
+    public long ASSET_x0020_Number { get; set; }
 }
 
-public class TransactionData
+public class AssetModel
 {
-    public string message { get; set; }
-    public string payment_url { get; set; }
-    public string va { get; set; }
-    public string retcode { get; set; }
-    public bool success { get; set; }
-    public string transaction_id { get; set; }
+    public string COMPANYCODE { get; set; }
+    public string ASSETCLASS { get; set; }
+    public string DESCRIPT { get; set; }
+    public string COSTCENTER { get; set; }
+    public string PLANT { get; set; }
+    public string ULIFE_BOOK { get; set; }
+    public string ULIFE_TAX { get; set; }
+    public string ULIFE_IFRS { get; set; }
 }
 
-public class TransactionResponse
+public class PushAssetModel
 {
-    public TransactionData data { get; set; }
+    public Metadata __metadata { get; set; }
+
+    public string Price_x002f_Original_x0020_Value { get; set; }
+}
+
+public class Metadata
+{
+    public string type { get; set; }
 }

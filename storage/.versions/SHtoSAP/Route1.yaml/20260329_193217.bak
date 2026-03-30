@@ -19,7 +19,7 @@
 
         - to:
             id: panggil-api-sharepoint
-            uri: "http://76.13.193.33:5001/api/v1/dummy/sharepoint"
+            uri: "http://76.13.193.33:5001/api/v1/RedPay/sharepoint"
 
         - unmarshal:
             id: konversi-json

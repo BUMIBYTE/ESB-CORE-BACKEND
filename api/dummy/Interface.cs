@@ -1,11 +1,12 @@
 using System.Text.Json;
 
-public interface IRedPayService
+public interface IDummyService
 {
 
     Task<object> GetData();
-    Task<object> GetDataESB();
-    Task<object> PostData(JsonElement request);
+    Task<object> PatchDummyWA(PushAssetModel pushAssetModel);
+    Task<object> GetDataECC();
+    Task<object> PostData(AssetModel request);
 
 
 }

@@ -6,10 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Trasgo.Shared.ViewModels;
 using Microsoft.AspNetCore.Http.Features;
-using RepositoryPattern.Services.RedPayService;
 using RepositoryPattern.Services.JbangService;
 using RepositoryPattern.Services.SystemService;
 using RepositoryPattern.Services.AuthService;
+using RepositoryPattern.Services.DummyService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +19,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:5001");
 
 // Dependency Injection
 builder.Services.AddSingleton<ConvertJWT>();
-builder.Services.AddScoped<IRedPayService, RedPayService>();
+builder.Services.AddScoped<IDummyService, DummyService>();
 builder.Services.AddScoped<IJbangService, JbangService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RepositoryPattern.Services.RedPayService;
+using RepositoryPattern.Services.DummyService;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -9,52 +9,24 @@ namespace Beres.Server.Controllers
     // [Authorize]
     [ApiController]
     [Route("api/v1/dummy")]
-    public class RedPayController : ControllerBase
+    public class DummyController : ControllerBase
     {
-        private readonly IRedPayService _RedPayService;
+        private readonly IDummyService _DummyService;
         private readonly ConvertJWT _ConvertJwt;
 
-        public RedPayController(ConvertJWT convert,IRedPayService RedPayService)
+        public DummyController(ConvertJWT convert, IDummyService DummyService)
         {
-            _RedPayService = RedPayService;
+            _DummyService = DummyService;
             _ConvertJwt = convert;
         }
 
-        // [HttpPost("generate-bodysign")]
-        // public async Task<IActionResult> GenerateBodysign([FromBody] CreateRedpayDto dto)
-        // {
-        //     try
-        //     {
-        //         var payload = new
-        //         {
-        //             redirect_url = "https://merchant.com/return",
-        //             user_id = "20250209TEST3477000000",
-        //             user_mdn = "08123412451",
-        //             merchant_transaction_id = "TESTSH0000011",
-        //             payment_method = "indosat_airtime",
-        //             currency = "IDR",
-        //             amount = 5000,
-        //             item_id = "1",
-        //             item_name = "PAYMENT",
-        //             notification_url = "https://merchant/callback-payment"
-        //         };
-
-        //         string appSecret = "ee9Kppp-tBUmRRFM";
-        //         string bodysign = RedPayService.GenerateBodySign(payload, appSecret);
-        //         return Ok(new { message = bodysign });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(new { message = ex.Message });
-        //     }
-        // }
 
         [HttpGet("sharepoint")]
-        public async Task<IActionResult> GetRedPayWA()
+        public async Task<IActionResult> GetDummyWA()
         {
             try
             {
-                var result = await _RedPayService.GetData();
+                var result = await _DummyService.GetData();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -63,25 +35,41 @@ namespace Beres.Server.Controllers
             }
         }
 
-        // [HttpGet("esb")]
-        // public async Task<IActionResult> GetDataESB()
-        // {
-        //     try
-        //     {                var result = await _RedPayService.GetDataESB();
-        //         return Ok(result);      
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(new { message = ex.Message });
-        //     }
-        // }
-
-        [HttpPost("sap")]
-        public async Task<IActionResult> PostRedPayWA([FromBody] JsonElement request)
+        [HttpPatch("updatesharepoint")]
+        public async Task<IActionResult> PatchDummyWA([FromBody] PushAssetModel request)
         {
             try
-            {                var result = await _RedPayService.PostData(request);
-                return Ok(result);      
+            {
+                var result = await _DummyService.PatchDummyWA(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("sapecc")]
+        public async Task<IActionResult> Getsapecc()
+        {
+            try
+            {
+                var result = await _DummyService.GetDataECC();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("pushtosap")]
+        public async Task<IActionResult> PostDummyWA([FromBody] AssetModel request)
+        {
+            try
+            {
+                var result = await _DummyService.PostData(request);
+                return Ok(result);
             }
             catch (Exception ex)
             {
