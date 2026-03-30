@@ -1,0 +1,15 @@
+- route:
+    id: timer_1774863646723
+    from:
+      uri: timer:tick?period=5000
+      steps:
+        - to:
+            id: http_1774863650191
+            uri: http://0.0.0.0:5001/api/v1/dummy/sharepoint
+        - unmarshal:
+            id: unmarshal_1774863659289
+            json:
+              library: Jackson
+        - log:
+            id: log_1774863664356
+            message: ${body[data]}

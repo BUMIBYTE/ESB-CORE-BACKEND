@@ -1,0 +1,8 @@
+route:
+  id: timer_1774862341336
+  from:
+    uri: timer:tick?period=30000
+    steps:
+      - log:
+          id: log_1774862345286
+          message: woi woi woi

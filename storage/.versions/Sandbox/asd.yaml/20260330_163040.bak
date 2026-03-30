@@ -1,0 +1,17 @@
+route:
+  id: timer_1774862341336
+  from:
+    uri: timer:sharepoint
+      parameters:
+        period: "30000"
+        delay: "1000"
+    steps:
+      - log:
+          id: log_1774862606066
+          message: ck cek
+      - to:
+          id: http_1774862565150
+          uri: http://0.0.0.0:5001/api/v1/dummy/sharepoint
+      - log:
+          id: log_1774862606066
+          message: ${body[ID]}
